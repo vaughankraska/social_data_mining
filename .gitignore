@@ -1,0 +1,69 @@
+# Our project ignorables
+data/
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.so
+
+# Environment variables
+.env
+.env.*
+
+# Development environment
+venv/
+.venv/
+env/
+ENV/
+
+# Python dependency management
+*.egg-info/
+*.eggs
+*.egg
+*.lock
+Pipfile
+Pipfile.lock
+poetry.lock
+
+# Test and coverage reports
+coverage/
+*.cover
+.hypothesis/
+.pytest_cache/
+.tox/
+.cache/
+
+# Logs and debugging
+*.log
+logs/
+*.out
+*.err
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+
+# Django
+*.sqlite3
+db.sqlite3
+media/
+staticfiles/
+*.pot
+local_settings.py
+
+# Flask
+instance/
+*.db
+__pycache__/
+
+# MyPy, Pyright, and similar tools
+.mypy_cache/
+.dmypy.json
+.pyre/
+
+# PyCharm and VS Code
+.idea/
+.vscode/
+*.code-workspace
+
+# System-specific
+.DS_Store
+Thumbs.db
