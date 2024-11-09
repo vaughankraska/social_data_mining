@@ -1,7 +1,9 @@
 # Datasheet for: twitter/text/image dataset[^1]
 
-## Authors: Anand Mathew M S, Finn Vaughankraska
+## Authors: Finn Vaughankraska, Anand Mathew M S
+
 ### Related Files:
+
 ./data/media_lists.txt
 ./data/media/*
 ./data/tweets.dat
@@ -251,13 +253,13 @@ __Is there an erratum?__ If so, please provide a link or other access point.
 No.
 
 __Will the dataset be updated (e.g., to correct labeling errors, add new instances, delete instances)?__ If so, please describe how often, by whom, and how updates will be communicated to users (e.g., mailing list, GitHub)?
-Possibly. The users of this dataset should only be the authors so they will notify eachother of updates via Github. They authors may add the data to a database in order to more easily and performantly process it.
+Possibly. The users of this dataset should only be the authors so they will notify each other of updates via Github. The authors may add the data to a database in order to more easily and performantly process it.
 
 __If the dataset relates to people, are there applicable limits on the retention of the data associated with the instances (e.g., were individuals in question told that their data would be retained for a fixed period of time and then deleted)?__ If so, please describe these limits and explain how they will be enforced.
 No, there are no limits on how long the data will be retained for. However, the authors do not intend to keep it longer than the 2024/2025 Uppsala University Fall Term.
 
 __Will older versions of the dataset continue to be supported/hosted/maintained?__ If so, please describe how. If not, please describe how its obsolescence will be communicated to users.
-No. The only backup version will be maintained and hosted as it was originally downloaed on upppsala.box.com. This is stated here and now.
+No. The only backup version will be maintained and hosted as it was originally downloaded on upppsala.box.com. This is stated here and now.
 
 __If others want to extend/augment/build on/contribute to the dataset, is there a mechanism for them to do so?__ If so, please provide a description. Will these contributions be validated/verified? If so, please describe how. If not, why not? Is there a process for communicating/distributing these contributions to other users? If so, please provide a description.
 No.
