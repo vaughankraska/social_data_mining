@@ -1,4 +1,4 @@
-# Datasheet for: twitter/text/image dataset[^1]
+# Datasheet for: Twitter/Text & Image dataset[^1]
 
 ## Authors: Finn Vaughankraska, Anand Mathew M S
 
@@ -119,7 +119,7 @@ No, the dataset is not self-contained since there are urls listed in the tweets 
     b) are there official archival versions of the complete dataset (i.e., including the external resources as they existed at the time the dataset was created);
     NA
     c) are there any restrictions (e.g., licenses, fees) associated with any of the external resources that might apply to a future user? Please provide descriptions of all external resources and any restrictions associated with them, as well as links or other access points, as appropriate.
-    The dataset download was protected by a password access granted by the course instructor.
+    The dataset download was protected by a password access granted by the course instructor and expiring on the 5th of November 2024.
 
 __Does the dataset contain data that might be considered confidential (e.g., data that is protected by legal privilege or by doctor-patient confidentiality, data that includes the content of individuals non-public communications)?__ If so, please provide a description.
 The data contains images and Tweets that could be classified as personal identifiable information.
@@ -131,7 +131,7 @@ __Does the dataset relate to people?__ If not, you may skip the remaining questi
 Yes.
 
 __Does the dataset identify any subpopulations (e.g., by age, gender)?__ If so, please describe how these subpopulations are identified and provide a description of their respective distributions within the dataset.
-If you consider people on social media who post and interact with content under the "cop21" hashtag, then yes the dataset identiefies subpopulations who interact with the hashtag.
+If you consider people on social media who post and interact with content under the "cop21" hashtag, then yes the dataset identifies subpopulations who interact with the hashtag.
 
 __Is it possible to identify individuals (i.e., one or more natural persons), either directly or indirectly (i.e., in combination with other data) from the dataset?__ If so, please describe how.
 Yes, the data are Tweets made by real people on Twitter. You can identify users by their username, name, author id, images, and by the content they post.
@@ -157,7 +157,7 @@ __Who was involved in the data collection process (e.g., students, crowdworkers,
 Students Anand Mathew and Finn Vaughankraska who are both unpaid. PolarVis (who studies visual persuasion) is "FORTE, the Swedish Research Council for Health, Working Life and Welfare; Uddannelses - og Forskningsstyrelsen, the Danish Agency for Higher Education and Science; the National Research, Development and Innovation Office Hungary; and FWF, the Austrian Science Fund under CHANSE ERA-NET Co-fund programme, which has received funding from the European Union’s Horizon 2020 Research and Innovation Programme". Matteo Magnani (who granted the students access) is assumed to be paid by Uppsala Univesity.
 
 __Over what timeframe was the data collected? Does this timeframe match the creation timeframe of the data associated with the instances (e.g., recent crawl of old news articles)?__ If not, please describe the time-frame in which the data associated with the instances was created.
-Tweets were collected in 2023 of the period 30/11 to 12/12 2015. The authors created/downloaded this dataset in 2024.
+Tweets were collected in 2023 of the period 30/11 to 12/12 2015. The authors created/downloaded this dataset in November 2024.
 
 __Were any ethical review processes conducted (e.g., by an institutional review board)?__ If so, please provide a description of these review processes, including the outcomes, as well as a link or other access point to any supporting documentation.
 No.
@@ -212,7 +212,7 @@ __Is there anything about the composition of the dataset or the way it was colle
 No.
 
 __Are there tasks for which the dataset should not be used?__ If so, please provide a description.
-Training LLMs and identifying individuals.
+Training LLMs and identifying individuals or anything outside the Mining of Social Data course.
 
 __Any other comments?__
 
@@ -259,7 +259,7 @@ __If the dataset relates to people, are there applicable limits on the retention
 No, there are no limits on how long the data will be retained for. However, the authors do not intend to keep it longer than the 2024/2025 Uppsala University Fall Term.
 
 __Will older versions of the dataset continue to be supported/hosted/maintained?__ If so, please describe how. If not, please describe how its obsolescence will be communicated to users.
-No. The only backup version will be maintained and hosted as it was originally downloaded on upppsala.box.com. This is stated here and now.
+No. The only backup version will be maintained and hosted as it was originally downloaded on upppsala.box.com. The authors have no control of the availability or contents of that version.
 
 __If others want to extend/augment/build on/contribute to the dataset, is there a mechanism for them to do so?__ If so, please provide a description. Will these contributions be validated/verified? If so, please describe how. If not, why not? Is there a process for communicating/distributing these contributions to other users? If so, please provide a description.
 No.
