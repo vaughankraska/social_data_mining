@@ -1,5 +1,6 @@
 import json
 import pandas as pd
+from neo4j import GraphDatabase
 
 
 def tweets_as_dataframe(file_path: str = "data/tweets.dat"):
@@ -34,3 +35,26 @@ def parse_referenced_tweets_to_dataframe(row: pd.Series):
     except (ValueError, SyntaxError):
         print(f"Warning: Failed to parse {row}")
         return None
+
+
+def load_json_to_neo4j(
+        uri: str = "neo4j://localhost",
+        auth: tuple = ("neo4j", "password"),
+        json_file_path: str = "tweets.dat"
+        ):
+    driver = GraphDatabase.driver(uri, auth=auth)
+    with driver.session() as session:
+        result = session.run(
+            """
+            CALL apoc.load.json($file_path)
+            YIELD value
+            RETURN value
+            """,
+            {
+                "file_path": (json_file_path)
+            }
+        )
+
+        for record in result:
+            # Process the loaded JSON data
+            print(record["value"])
