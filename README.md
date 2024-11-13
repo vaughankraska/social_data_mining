@@ -26,7 +26,6 @@ Helpful reources:
     - [and the python client for that plugin](https://github.com/neo4j/graph-data-science-client)
 
 
-
 ### Setup
 (assumes data has been downloaded from uppsala.box.com and put in ./data)
 1. Start Docker with `docker compose up --build -d`

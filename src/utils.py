@@ -1,13 +1,14 @@
 import json
 import pandas as pd
 from neo4j import GraphDatabase
+from typing import Optional, Any, Dict
 
 
 def tweets_as_dataframe(file_path: str = "data/tweets.dat"):
     data = []
 
     try:
-        with open(file_path, 'r') as file:
+        with open(file_path, "r") as file:
             for line in file:
                 try:
                     tweet = json.loads(line.strip())
@@ -37,11 +38,17 @@ def parse_referenced_tweets_to_dataframe(row: pd.Series):
         return None
 
 
+def get_entity_or_none(data: Dict[str, Any], key: str) -> Optional[Any]:
+    if key in data:
+        return data[key]
+    return None
+
+
 def load_json_to_neo4j(
-        uri: str = "neo4j://localhost",
-        auth: tuple = ("neo4j", "password"),
-        json_file_path: str = "tweets.dat"
-        ):
+    uri: str = "neo4j://localhost",
+    auth: tuple = ("neo4j", "password"),
+    json_file_path: str = "tweets.dat",
+):
     driver = GraphDatabase.driver(uri, auth=auth)
     with driver.session() as session:
         result = session.run(
@@ -50,9 +57,7 @@ def load_json_to_neo4j(
             YIELD value
             RETURN value
             """,
-            {
-                "file_path": (json_file_path)
-            }
+            {"file_path": (json_file_path)},
         )
 
         for record in result:
