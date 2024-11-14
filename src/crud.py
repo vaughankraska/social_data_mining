@@ -5,9 +5,9 @@ from typing import Dict, Any
 
 def get_tweets_count(tx: Session):
     result = tx.run("""
-                    MATCH (t:Tweet)
-                    RETURN count(t) AS tweet_count;
-                    """)
+        MATCH (t:Tweet)
+        RETURN count(t) AS tweet_count;
+    """)
     return result.data()
 
 def get_retweeted_tweets(tx: Session):
@@ -18,12 +18,31 @@ def get_retweeted_tweets(tx: Session):
     return result.data()
 
 
-def get_tweets_with_geo(tx: Session):
+def get_retweeted_edge_list(tx: Session):
     result = tx.run("""
-        MATCH (t:Tweet)
-        WHERE t.geo IS NOT NULL
-        RETURN t
-    """)
+        MATCH (u:User)
+        WITH COLLECT(DISTINCT {
+          id: u.id,
+          label: 'User',
+          properties: {
+            author_id: u.id
+          }
+        }) as nodes
+
+        MATCH (t1:Tweet)-[r:REFERENCES {type: 'retweeted'}]->(t2:Tweet)
+        WHERE t1.author_id IS NOT NULL AND t2.author_id IS NOT NULL
+        WITH nodes, COLLECT(DISTINCT {
+          source: t1.author_id,
+          target: t2.author_id,
+          type: 'RETWEET',
+          weight: 1
+        }) as edges
+
+        RETURN {
+          nodes: nodes,
+          edges: edges
+        } as graph_data
+                    """)
     return result.data()
 
 
