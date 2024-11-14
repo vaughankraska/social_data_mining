@@ -4,7 +4,7 @@ from neo4j import GraphDatabase
 from typing import Optional, Any, Dict
 
 
-def tweets_as_dataframe(file_path: str = "data/tweets.dat"):
+def tweets_as_dataframe(file_path: str = "data/tweets.dat", save=False):
     data = []
 
     try:
@@ -16,6 +16,9 @@ def tweets_as_dataframe(file_path: str = "data/tweets.dat"):
                 except json.JSONDecodeError as e:
                     print(f"Skipping invalid JSON line: {e}")
         tweets_df = pd.DataFrame(data)
+
+        if save:
+            tweets_df.to_csv("data/tweets.csv", index=False)
 
         return tweets_df
     except FileNotFoundError:
@@ -44,22 +47,26 @@ def get_entity_or_none(data: Dict[str, Any], key: str) -> Optional[Any]:
     return None
 
 
-def load_json_to_neo4j(
-    uri: str = "neo4j://localhost",
-    auth: tuple = ("neo4j", "password"),
+def load_tweet_json_to_neo4j(
+    driver: GraphDatabase,
     json_file_path: str = "tweets.dat",
 ):
-    driver = GraphDatabase.driver(uri, auth=auth)
     with driver.session() as session:
-        result = session.run(
+        session.run(
             """
             CALL apoc.load.json($file_path)
             YIELD value
+            MERGE (t:Tweet {id: value.id})
+            SET t.text = value.text
+            SET t.author_id = value.author_id
+            SET t.conversation_id = value.conversation_id
+            SET t.lang = value.lang
+            MERGE (u:User {id: value.author_id})
+            WITH t, value
+            UNWIND value.referenced_tweets AS ref_tweet
+            MERGE (rt:Tweet {id: ref_tweet.id})
+            MERGE (t)-[:REFERENCES {type: ref_tweet.type}]->(rt)
             RETURN value
             """,
             {"file_path": (json_file_path)},
         )
-
-        for record in result:
-            # Process the loaded JSON data
-            print(record["value"])

@@ -33,4 +33,7 @@ docker exec -it <container> bin/cypher-shell -u neo4j -p password "MATCH (n) DET
 (assumes data has been downloaded from uppsala.box.com and put in ./data)
 1. Start Docker with `docker compose up --build -d`
 2. Copy tweets.dat to the neo4j workspace `cp data/tweets.dat data/neo4j_db/import/tweets.dat`
+```bash
+sudo cp data/tweets.dat data/neo4j_db/import
+```
 3. Run some import script that we havent created yet.
