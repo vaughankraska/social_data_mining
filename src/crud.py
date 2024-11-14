@@ -3,6 +3,13 @@ from neo4j import Session
 from typing import Dict, Any
 
 
+def get_tweets_count(tx: Session):
+    result = tx.run("""
+                    MATCH (t:Tweet)
+                    RETURN count(t) AS tweet_count;
+                    """)
+    return result.data()
+
 def get_retweeted_tweets(tx: Session):
     result = tx.run("""
         MATCH (t:Tweet)-[r:REFERENCES {type: 'retweet'}]->(rt:Tweet)

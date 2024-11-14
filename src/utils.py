@@ -44,22 +44,27 @@ def get_entity_or_none(data: Dict[str, Any], key: str) -> Optional[Any]:
     return None
 
 
-def load_json_to_neo4j(
-    uri: str = "neo4j://localhost",
-    auth: tuple = ("neo4j", "password"),
+def load_tweet_json_to_neo4j(
+    driver: GraphDatabase,
     json_file_path: str = "tweets.dat",
 ):
-    driver = GraphDatabase.driver(uri, auth=auth)
     with driver.session() as session:
         result = session.run(
             """
             CALL apoc.load.json($file_path)
             YIELD value
+            MERGE (t:Tweet {id: value.id})
+            SET t += value
+            MERGE (u:User {id: value.author_id})
+            WITH t, value
+            UNWIND value.referenced_tweets AS ref_tweet
+            MERGE (rt:Tweet {id: ref_tweet.id})
+            MERGE (t)-[:REFERENCES {type: ref_tweet.type}]->(rt)
             RETURN value
             """,
             {"file_path": (json_file_path)},
         )
 
         for record in result:
-            # Process the loaded JSON data
+            # Print the loaded JSON data
             print(record["value"])
