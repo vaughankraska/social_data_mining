@@ -24,7 +24,10 @@ Helpful reources:
 - [Medium article on setting it up in Docker](https://medium.com/@matthewghannoum/simple-graph-database-setup-with-neo4j-and-docker-compose-061253593b5a)
 - [The graph-database plugin on Github](https://github.com/neo4j/graph-data-science)
     - [and the python client for that plugin](https://github.com/neo4j/graph-data-science-client)
-
+Delete all nodes from DB
+```bash
+docker exec -it <container> bin/cypher-shell -u neo4j -p password "MATCH (n) DETACH DELETE n"
+```
 
 ### Setup
 (assumes data has been downloaded from uppsala.box.com and put in ./data)
