@@ -1,7 +1,5 @@
 import json
 import pandas as pd
-from neo4j import GraphDatabase
-from typing import Optional, Any, Dict
 
 
 def tweets_as_dataframe(file_path: str = "data/tweets.dat", save=False):
@@ -39,34 +37,3 @@ def parse_referenced_tweets_to_dataframe(row: pd.Series):
     except (ValueError, SyntaxError):
         print(f"Warning: Failed to parse {row}")
         return None
-
-
-def get_entity_or_none(data: Dict[str, Any], key: str) -> Optional[Any]:
-    if key in data:
-        return data[key]
-    return None
-
-
-def load_tweet_json_to_neo4j(
-    driver: GraphDatabase,
-    json_file_path: str = "tweets.dat",
-):
-    with driver.session() as session:
-        session.run(
-            """
-            CALL apoc.load.json($file_path)
-            YIELD value
-            MERGE (t:Tweet {id: value.id})
-            SET t.text = value.text
-            SET t.author_id = value.author_id
-            SET t.conversation_id = value.conversation_id
-            SET t.lang = value.lang
-            MERGE (u:User {id: value.author_id})
-            WITH t, value
-            UNWIND value.referenced_tweets AS ref_tweet
-            MERGE (rt:Tweet {id: ref_tweet.id})
-            MERGE (t)-[:REFERENCES {type: ref_tweet.type}]->(rt)
-            RETURN value
-            """,
-            {"file_path": (json_file_path)},
-        )

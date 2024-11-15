@@ -1,5 +1,5 @@
-from neo4j import GraphDatabase
+import sqlite3
+from sqlite3 import Connection
 
-NEO4J_URI = "neo4j://localhost"
-NEO4J_AUTH = ("neo4j", "password")
-db_driver: GraphDatabase = GraphDatabase.driver(NEO4J_URI, auth=NEO4J_AUTH)
+DB_NAME = "sdm.db"
+db_connection: Connection = sqlite3.connect(DB_NAME)

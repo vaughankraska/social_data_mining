@@ -51,7 +51,6 @@ local_settings.py
 
 # Flask
 instance/
-*.db
 __pycache__/
 
 # MyPy, Pyright, and similar tools
