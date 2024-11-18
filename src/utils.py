@@ -1,5 +1,8 @@
 import json
 import pandas as pd
+import igraph as ig
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def tweets_as_dataframe(file_path: str = "data/tweets.dat", save=False):
@@ -37,3 +40,36 @@ def parse_referenced_tweets_to_dataframe(row: pd.Series):
     except (ValueError, SyntaxError):
         print(f"Warning: Failed to parse {row}")
         return None
+    
+def analyze_graph(g: ig.Graph):
+    order = g.vcount()
+    size = g.ecount()
+    components = g.components()
+    no_components = len(components)
+    size_of_largest_component = max([len(component) for component in components])
+    density = g.density()
+    transitivity = g.transitivity_undirected()  # Thea suggested there's a better one
+    
+    print(f"Order: {order}")
+    print(f"Size: {size}")
+    print(f"No .of Components: {no_components}")
+    print(f"Size of largest component: {size_of_largest_component}")
+    print(f"Density: {density}")
+    print(f"Transitivity: {transitivity}")
+    
+    degree_dist = g.degree()
+    degree_counts = np.bincount(degree_dist)
+    degrees = np.arange(len(degree_counts))
+    
+    non_zero = degree_counts > 0
+    degrees = degrees[non_zero]
+    degree_counts = degree_counts[non_zero]
+    
+    plt.figure(figsize=(8, 6))
+    plt.loglog(degrees, degree_counts, marker="o", linestyle="", markersize=6, alpha=0.7, label="Degree Distribution")
+    plt.title("Degree Distribution (Log-Log Scale)")
+    plt.xlabel("Degree (log)")
+    plt.ylabel("Frequency (log)")
+    plt.grid(which="both", linestyle="--", alpha=0.7)
+    plt.legend()
+    plt.show()
