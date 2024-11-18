@@ -92,6 +92,26 @@ def prepare_graph(g: ig.Graph, layout: ig.Layout = None) -> Tuple[ig.Graph, ig.L
     return g, layout
 
 
+# Function for task 1.4
+def prepare_graph_for_degree(g: ig.Graph, base_size: int = 1, scale_factor: int = 5):
+    degrees = g.degree()
+
+    g.vs["size"] = [base_size + scale_factor * degree for degree in degrees]
+
+    return g
+
+
+# Function for task 1.5
+def prepare_graph_for_betweenness(g: ig.Graph, base_size: int = 1, scale_factor: int = 5):
+    betweenness = g.betweenness()
+    max_betweenness = max(betweenness) if max(betweenness) > 0 else 1
+
+    g.vs["size"] = [base_size + scale_factor * (b/max_betweenness) for b in betweenness]
+
+    return g
+
+
+# Function to plot the graph
 def plot_graph(g: ig.Graph, layout: ig.Layout, target_file: str = None):
     visual_style = {
         "layout": layout,
@@ -113,3 +133,16 @@ def plot_graph(g: ig.Graph, layout: ig.Layout, target_file: str = None):
         plt.show()  # Show plot interactively
     else:
         print(f"Plot saved to: {target_file}")
+
+
+# Function for task 1.6
+def top_10_for_network(g: ig.Graph):
+    degrees = g.degree()
+    top_10_degrees = sorted(degrees, reverse=True)[:10]
+    top_10_degree_authors = [g.vs[i]["name"] for i in top_10_degrees]
+
+    betweenness = g.betweenness()
+    top_10_betweenness = sorted(betweenness, reverse=True)[:10]
+    top_10_betweenness_authors = [g.vs[i]["name"] for i in top_10_betweenness]
+
+    return top_10_degree_authors, top_10_betweenness_authors
