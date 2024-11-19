@@ -78,6 +78,7 @@ def analyze_graph(g: ig.Graph):
 
 
 def prepare_graph(g: ig.Graph, layout: ig.Layout = None) -> Tuple[ig.Graph, ig.Layout]:
+    g.simplify()
     if layout is None:
         layout = g.layout("circle")
 
@@ -87,7 +88,7 @@ def prepare_graph(g: ig.Graph, layout: ig.Layout = None) -> Tuple[ig.Graph, ig.L
     g.vs["label"] = None
 
     g.es["color"] = "rgba(0, 0, 0, 0.1)"
-    g.es["width"] = 0.5
+    g.es["width"] = 0.10
 
     return g, layout
 
