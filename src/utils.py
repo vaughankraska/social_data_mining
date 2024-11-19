@@ -138,11 +138,12 @@ def plot_graph(g: ig.Graph, layout: ig.Layout, target_file: str = None):
 # Function for task 1.6
 def top_10_for_network(g: ig.Graph):
     degrees = g.degree()
-    top_10_degrees = sorted(degrees, reverse=True)[:10]
-    top_10_degree_authors = [g.vs[i]["name"] for i in top_10_degrees]
+    degree_dict = {g.vs[i]["name"]: degrees[i] for i in range(len(g.vs))}
+
+    top_10_degrees = dict(sorted(degree_dict.items(), key=lambda item: item[1], reverse=True)[:10])
 
     betweenness = g.betweenness()
-    top_10_betweenness = sorted(betweenness, reverse=True)[:10]
-    top_10_betweenness_authors = [g.vs[i]["name"] for i in top_10_betweenness]
+    betweenness_dict = {g.vs[i]["name"]: betweenness[i] for i in range(len(g.vs))}
+    top_10_betweenness = dict(sorted(betweenness_dict.items(), key=lambda item: item[1], reverse=True)[:10])
 
-    return top_10_degree_authors, top_10_betweenness_authors
+    return top_10_degrees, top_10_betweenness
