@@ -151,7 +151,10 @@ def top_10_for_network(g: ig.Graph):
     return top_10_degrees, top_10_betweenness
 
 
-def random_walk(g: ig.Graph, actor: ig.Vertex, iterations: int = 10_000) -> list:
+def random_walk(g: ig.Graph, actor: ig.Vertex = None, iterations: int = 10_000) -> list:
+    if actor is None:
+        actor = random.randint(0, g.vcount() - 1)
+
     token_counts = [0] * g.vcount()
     for i in range(iterations):
         token_counts[actor.index] += 1
