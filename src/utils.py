@@ -1,4 +1,5 @@
 import json
+import random
 import pandas as pd
 import igraph as ig
 import numpy as np
@@ -50,7 +51,7 @@ def analyze_graph(g: ig.Graph):
     no_components = len(components)
     size_of_largest_component = max([len(component) for component in components])
     density = g.density()
-    transitivity = g.transitivity_undirected()  # Thea suggested there's a better one
+    transitivity = g.transitivity_avglocal_undirected()
 
     print(f"Order: {order}")
     print(f"Size: {size}")
@@ -148,3 +149,36 @@ def top_10_for_network(g: ig.Graph):
     top_10_betweenness = dict(sorted(betweenness_dict.items(), key=lambda item: item[1], reverse=True)[:10])
 
     return top_10_degrees, top_10_betweenness
+
+
+def random_walk(g: ig.Graph, actor: ig.Vertex = None, iterations: int = 10_000) -> list:
+    if actor is None:
+        actor = g.vs[random.randint(0, g.vcount() - 1)]
+
+    token_counts = [0] * g.vcount()
+    for i in range(iterations):
+        token_counts[actor.index] += 1
+        actor = random.choice(actor.neighbors())
+
+    token_ratios = np.array(token_counts) / iterations
+    return token_ratios.tolist()
+
+
+def random_diffusion(g: ig.Graph, actor: ig.Vertex = None, beta: float = 0.05, iterations: int = 100) -> list:
+    g = g.copy()
+    if actor is None:
+        actor = g.vs[random.randint(0, g.vcount() - 1)]
+    infected = set([actor.index])
+
+    for _ in range(iterations):
+        infected_actors: ig.seq.VertexSeq = g.vs[list(infected)]
+        for infected_actor in infected_actors:
+            neighbors = infected_actor.neighbors()
+            infected_neighbors = random.choices(neighbors, weights= [beta] * len(neighbors), k=len(neighbors))
+            infected.update([n.index for n in infected_neighbors])
+        print(f"{_}infected={len(infected)}")
+        if len(infected) == g.vcount():
+            print(f"All nodes infected after {_} rounds.")
+            break
+
+    return list(infected), len(infected)
