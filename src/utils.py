@@ -87,7 +87,7 @@ def prepare_graph(g: ig.Graph, layout: ig.Layout = None) -> Tuple[ig.Graph, ig.L
     g.vs["frame_width"] = 0
     g.vs["label"] = None
 
-    g.es["color"] = "rgba(0, 0, 0, 0.1)"
+    g.es["color"] = "rgba(1, 1, 1, 0.01)"
     g.es["width"] = 0.10
 
     return g, layout
