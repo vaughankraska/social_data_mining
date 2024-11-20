@@ -1,4 +1,5 @@
 import json
+import random
 import pandas as pd
 import igraph as ig
 import numpy as np
@@ -50,7 +51,7 @@ def analyze_graph(g: ig.Graph):
     no_components = len(components)
     size_of_largest_component = max([len(component) for component in components])
     density = g.density()
-    transitivity = g.transitivity_undirected()  # Thea suggested there's a better one
+    transitivity = g.transitivity_avglocal_undirected()
 
     print(f"Order: {order}")
     print(f"Size: {size}")
@@ -148,3 +149,13 @@ def top_10_for_network(g: ig.Graph):
     top_10_betweenness = dict(sorted(betweenness_dict.items(), key=lambda item: item[1], reverse=True)[:10])
 
     return top_10_degrees, top_10_betweenness
+
+
+def random_walk(g: ig.Graph, actor: ig.Vertex, iterations: int = 10_000) -> list:
+    token_counts = [0] * g.vcount()
+    for i in range(iterations):
+        token_counts[actor.index] += 1
+        actor = random.choice(actor.neighbors())
+
+    token_ratios = np.array(token_counts) / iterations
+    return token_ratios.tolist()
