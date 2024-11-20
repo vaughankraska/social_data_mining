@@ -153,7 +153,7 @@ def top_10_for_network(g: ig.Graph):
 
 def random_walk(g: ig.Graph, actor: ig.Vertex = None, iterations: int = 10_000) -> list:
     if actor is None:
-        actor = random.randint(0, g.vcount() - 1)
+        actor = g.vs[random.randint(0, g.vcount() - 1)]
 
     token_counts = [0] * g.vcount()
     for i in range(iterations):
@@ -162,3 +162,23 @@ def random_walk(g: ig.Graph, actor: ig.Vertex = None, iterations: int = 10_000) 
 
     token_ratios = np.array(token_counts) / iterations
     return token_ratios.tolist()
+
+
+def random_diffusion(g: ig.Graph, actor: ig.Vertex = None, beta: float = 0.05, iterations: int = 100) -> list:
+    g = g.copy()
+    if actor is None:
+        actor = g.vs[random.randint(0, g.vcount() - 1)]
+    infected = set([actor.index])
+
+    for _ in range(iterations):
+        infected_actors: ig.seq.VertexSeq = g.vs[list(infected)]
+        for infected_actor in infected_actors:
+            neighbors = infected_actor.neighbors()
+            infected_neighbors = random.choices(neighbors, weights= [beta] * len(neighbors), k=len(neighbors))
+            infected.update([n.index for n in infected_neighbors])
+        print(f"{_}infected={len(infected)}")
+        if len(infected) == g.vcount():
+            print(f"All nodes infected after {_} rounds.")
+            break
+
+    return list(infected), len(infected)
