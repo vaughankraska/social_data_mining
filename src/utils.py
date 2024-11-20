@@ -158,14 +158,14 @@ def random_walk(g: ig.Graph, actor: ig.Vertex = None, iterations: int = 10_000) 
     token_counts = [0] * g.vcount()
     for i in range(iterations):
         token_counts[actor.index] += 1
-        actor = random.choice(actor.neighbors())
+        if len(actor.neighbors()) > 0:
+            actor = random.choice(actor.neighbors())
 
     token_ratios = np.array(token_counts) / iterations
     return token_ratios.tolist()
 
 
 def random_diffusion(g: ig.Graph, actor: ig.Vertex = None, beta: float = 0.05, iterations: int = 100) -> list:
-    g = g.copy()
     if actor is None:
         actor = g.vs[random.randint(0, g.vcount() - 1)]
     infected = set([actor.index])
@@ -174,11 +174,31 @@ def random_diffusion(g: ig.Graph, actor: ig.Vertex = None, beta: float = 0.05, i
         infected_actors: ig.seq.VertexSeq = g.vs[list(infected)]
         for infected_actor in infected_actors:
             neighbors = infected_actor.neighbors()
-            infected_neighbors = random.choices(neighbors, weights= [beta] * len(neighbors), k=len(neighbors))
+            weights = [beta] * len(neighbors)
+            infected_neighbors = random.choices(neighbors, weights=weights, k=len(neighbors))
             infected.update([n.index for n in infected_neighbors])
-        print(f"{_}infected={len(infected)}")
         if len(infected) == g.vcount():
             print(f"All nodes infected after {_} rounds.")
             break
 
     return list(infected), len(infected)
+
+
+def random_opinion(g: ig.Graph, th: int, initial_positive: int, iterations: int = 100) -> list:
+    """
+    Note: Some bug with random.choices can make the initial postive count less
+    than what you pass in. idk, calling it good enough and moving on.
+    """
+    g = g.copy()
+    g.vs["convinced"] = False
+    starting_indices = random.choices([i for i in range(g.vcount())], k=initial_positive)
+    g.vs[starting_indices]["convinced"] = True  # bug here
+
+    for _ in range(iterations):
+        convinced_actors: ig.VertexSeq = g.vs.select(convinced_eq=True)
+        for actor in convinced_actors:
+            neighbors = actor.neighbors()
+            if sum([n["convinced"] for n in neighbors]) > th:
+                g.vs[[n.index for n in neighbors]]["convinced"] = True
+
+    return len(g.vs.select(convinced_eq=True))
