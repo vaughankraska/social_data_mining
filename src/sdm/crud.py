@@ -1,5 +1,5 @@
 import pandas as pd
-from src.utils import tweets_as_dataframe
+from sdm.utils import tweets_as_dataframe
 from sqlite3 import Connection
 from typing import List, Dict, Any
 
@@ -126,13 +126,13 @@ def ingest_tweets(
     df = tweets_as_dataframe(file_path=data_path)
     df[possibly_problematic] = df[possibly_problematic].astype(str)
     df = df.join(
-            pd.DataFrame(
-                df["referenced_tweets"].dropna().explode().tolist()
-                ).add_prefix("rt_"),
-            )
+        pd.DataFrame(df["referenced_tweets"].dropna().explode().tolist()).add_prefix(
+            "rt_"
+        ),
+    )
 
     for i in range(0, len(df), chunk_size):
-        chunk = df.iloc[i:i + chunk_size]
+        chunk = df.iloc[i : i + chunk_size]
         tweets_chunk = chunk[tweets_columns].values.tolist()
         rt_chunk = chunk[["id", "rt_id", "rt_type"]].dropna().values.tolist()
         cur.executemany(tweet_query, tweets_chunk)

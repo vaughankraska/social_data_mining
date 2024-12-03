@@ -1,0 +1,16 @@
+[project]
+name = "text-mining"
+version = "0.1.0"
+description = "Lib for text mining section"
+readme = "README.md"
+authors = [
+    { name = "vaughankraska", email = "vaughankraska@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+    "krippendorff>=0.8.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

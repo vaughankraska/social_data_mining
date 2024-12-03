@@ -69,3 +69,4 @@ __pycache__/
 # System-specific
 .DS_Store
 Thumbs.db
+.python-version
