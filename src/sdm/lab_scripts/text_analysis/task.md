@@ -4,6 +4,11 @@
 1. **Task 1.1: Data Selection**
    - Extract tweets with metadata to define a research question.
    - Reflection: Filter unusable tweets.
+Research question: what is the sentiment of tweets in the COP21 space by `Business actors` and `Private individuals`
+```psuedo
+with select author ids from accounts table where type is business actors or private individuals where lang is en
+select accounts.type, text, lang, author id, from tweets where lang is en innder join previous cte.
+```
 
 2. **Task 1.2: Data Annotation**
    - Collaboratively annotate tweets (-1, 0, 1 for sentiment).
