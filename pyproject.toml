@@ -23,6 +23,7 @@ dependencies = [
 [project.scripts]
 sdm = "sdm:main"
 inaccounts = "sdm:insert_accounts"
+test = "sdm:test"
 
 [tool.uv.sources]
 network-analysis = { workspace = true }

@@ -92,7 +92,9 @@ def create_accounts_table(db: Connection):
 
 
 def ingest_accounts(db: Connection, data_path: str = "data/accounts.tsv", chunk_size: int = 10_000):
-    df = pd.read_csv(data_path, delimiter="\t")
+    df = pd.read_csv(data_path, delimiter="\t", dtype={"author_id": str})
+    df["author_id"] = df["author_id"].astype(str)
+    print(df.info())
     create_accounts_table(db)
 
     query = """
