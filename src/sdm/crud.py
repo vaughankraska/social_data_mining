@@ -77,6 +77,41 @@ def create_ref_tweets_table(db: Connection):
     cur.execute(query)
 
 
+def create_accounts_table(db: Connection):
+    cur = db.cursor()
+    query = """
+    CREATE TABLE IF NOT EXISTS accounts (
+            author_id TEXT,
+            account_type TEXT,
+            lang TEXT,
+            stance TEXT,
+            FOREIGN KEY (author_id) REFERENCES tweets(author_id)
+            )
+    """
+    cur.execute(query)
+
+
+def ingest_accounts(db: Connection, data_path: str = "data/accounts.tsv", chunk_size: int = 10_000):
+    df = pd.read_csv(data_path, delimiter="\t")
+    create_accounts_table(db)
+
+    query = """
+    INSERT INTO accounts (
+            author_id,
+            account_type,
+            lang,
+            stance
+            )
+    VALUES (?, ?, ?, ?)
+    """
+    cur = db.cursor()
+    for i in range(0, len(df), chunk_size):
+        chunk_values = df.iloc[i : i + chunk_size].values.tolist()
+        cur.executemany(query, chunk_values)
+        db.commit()
+    print("[*] Inserted accounts")
+
+
 def ingest_tweets(
     db: Connection, data_path: str = "data/tweets.dat", chunk_size=100_000
 ):

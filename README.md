@@ -62,7 +62,10 @@ Then with your activated env (should be called sdm), you can run whatever `pytho
 
 uv also support scripts (but I havent played with it). They are in `pyproject.toml` under `[project.scripts]` and allow you to create aliases for certain scripts (kinda like make or many other package managers)
 
-We can run main with just
+We can run scripts (main as defined in scripts section of toml) with just
 ```bash
 uv run sdm
 ```
+Also added a script for ingesting data from accounts.tsv into the accounts table:
+```bash
+uv run inaccounts
