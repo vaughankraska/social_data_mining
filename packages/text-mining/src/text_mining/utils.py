@@ -130,11 +130,13 @@ def krippendorff_analysis(annotations_matrix: np.ndarray, method_names: List[str
 def analyze_with_transformer(texts: List[str]) -> List[float]:
     """
     Uses a DistilBERT model fine-tuned on sentiment analysis.
+    Does not work with pd.Series! Use text_column.tolist()
+
     Returns: List[float]: A list of sentiment scores [-1 to 1]
     """
 
     sentiment_analyzer = pipeline(model="distilbert/distilbert-base-uncased-finetuned-sst-2-english")
-    results = [sentiment_analyzer(text)[0] for text in texts]
+    results = sentiment_analyzer(texts)
 
     sentiment_scores = []
     for res in results:

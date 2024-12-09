@@ -45,12 +45,4 @@ def load_excel_annotations(file_path: str) -> pd.DataFrame:
     coder1_df = pd.read_excel(file_path, sheet_name=sheet_names[1])
     coder1_df["coder"] = 1
 
-    coder2_df = pd.read_excel(file_path, sheet_name=sheet_names[2])
-    coder2_df["coder"] = 2
-
-    coder3_df = pd.read_excel(file_path, sheet_name=sheet_names[3])
-    coder3_df["coder"] = 3
-
-    combined_df = pd.concat([coder1_df, coder2_df, coder3_df], ignore_index=True)
-
-    return combined_df
+    return coder1_df
