@@ -19,6 +19,7 @@ nltk.download("stopwords")
 nltk.download("punkt")
 nltk.download("wordnet")
 
+
 def annotate_tweet(text: str, sentiment_dict: Dict[str, int]) -> float:
     words = re.findall(r"\b\w+\b", text.lower())
     unique_words = set(words)
@@ -69,8 +70,18 @@ def preprocess_tweets(texts: List[str]) -> List[str]:
 
 
 def train_classifier(
-    tweets: List[str], labels: List[float]
+    tweets: List[str], labels: List[float], test_size: float = 0.20
 ) -> Tuple[MultinomialNB, CountVectorizer]:
+    """
+    Trains classifier using MultiNomialNB.
+
+    Example usage from Text analysis lab:
+        ```python
+        cls_final, vectorizer = train_classifier(df["TEXT"].tolist(), labels=df["CODE"], test_size=0.02)
+        processed_data = ml_annotations = cls_final.predict(vectorizer.transform(preprocess_tweets(df["TEXT"])))
+        df["ml_sentiment_final"] = ml_annotations
+        ```
+    """
 
     preprocessed_tweets = preprocess_tweets(tweets)
 
@@ -80,7 +91,7 @@ def train_classifier(
     X = vectorizer.fit_transform(preprocessed_tweets)
 
     X_train, X_test, y_train, y_test = train_test_split(
-        X, labels, test_size=0.2, random_state=42
+        X, labels, test_size=test_size, random_state=42
     )
 
     clf = MultinomialNB()
