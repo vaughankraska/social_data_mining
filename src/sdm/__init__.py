@@ -34,5 +34,6 @@ def test() -> None:
     print(df.info())
     print(df.head())
 
+
 def main() -> None:
     print("Hello from sdm!")
