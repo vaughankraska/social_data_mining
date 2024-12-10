@@ -1,6 +1,6 @@
-import pandas as pd
 from sdm.config import get_db_connection
 from sdm.crud import ingest_accounts
+from text_mining.data import get_tweet_corpora
 
 
 def insert_accounts() -> None:
@@ -13,24 +13,8 @@ def insert_accounts() -> None:
 
 def test() -> None:
     db = get_db_connection()
-    res = db.execute("""
-               SELECT
-                   a.author_id AS account_id,
-                   t.text AS tweet_text,
-                   a.account_type,
-                   a.lang,
-                   a.stance
-               FROM
-                   accounts a
-               JOIN
-                   tweets t
-               ON
-                   a.author_id = t.author_id
-               WHERE
-                   a.lang = 'en'
-                   AND a.account_type IN ('Private individuals', 'Business actors')
-               """).fetchall()
-    df = pd.DataFrame(res)
+    min_chars = 100
+    df = get_tweet_corpora(db, min_chars=min_chars)
     print(df.info())
     print(df.head())
 

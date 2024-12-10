@@ -77,8 +77,12 @@ def train_classifier(
 
     Example usage from Text analysis lab:
         ```python
-        cls_final, vectorizer = train_classifier(df["TEXT"].tolist(), labels=df["CODE"], test_size=0.02)
-        processed_data = ml_annotations = cls_final.predict(vectorizer.transform(preprocess_tweets(df["TEXT"])))
+        cls_final, vectorizer = train_classifier(
+            df["TEXT"].tolist(), labels=df["CODE"], test_size=0.02
+        )
+        processed_data = ml_annotations = cls_final.predict(
+            vectorizer.transform(preprocess_tweets(df["TEXT"]))
+        )
         df["ml_sentiment_final"] = ml_annotations
         ```
     """
@@ -104,19 +108,21 @@ def train_classifier(
     return clf, vectorizer
 
 
-def krippendorff_analysis(annotations_matrix: np.ndarray, method_names: List[str]) -> None:
+def krippendorff_analysis(
+    annotations_matrix: np.ndarray, method_names: List[str]
+) -> None:
     """
     Calculate and print a summary of Krippendorff's Alpha comparing multiple sentiment analysis methods.
     """
     annotations_matrix = np.array(annotations_matrix)
 
-    assert annotations_matrix.shape[1] == len(method_names), \
-        "Number of methods must match the number of columns in matrix."
+    assert annotations_matrix.shape[1] == len(
+        method_names
+    ), "Number of methods must match the number of columns in matrix."
 
     alpha = krippendorff.alpha(
-            reliability_data=annotations_matrix.T,
-            level_of_measurement="ordinal"
-            )
+        reliability_data=annotations_matrix.T, level_of_measurement="ordinal"
+    )
     print(f"Krippendorff's Alpha: {alpha:.4f}")
 
     # alpha close to 1, it indicates strong agreement between methods
@@ -134,8 +140,12 @@ def krippendorff_analysis(annotations_matrix: np.ndarray, method_names: List[str
         print(f"\n{target_method} comparison with other methods:")
         for j, comparison_method in enumerate(method_names):
             if i != j:
-                agreement = np.mean(annotations_matrix[:, i] == annotations_matrix[:, j])
-                print(f"  '{target_method}' vs. '{comparison_method}': {agreement * 100:.2f}% agreement")
+                agreement = np.mean(
+                    annotations_matrix[:, i] == annotations_matrix[:, j]
+                )
+                print(
+                    f"  '{target_method}' vs. '{comparison_method}': {agreement * 100:.2f}% agreement"
+                )
 
 
 def analyze_with_transformer(texts: List[str]) -> List[float]:
@@ -146,7 +156,9 @@ def analyze_with_transformer(texts: List[str]) -> List[float]:
     Returns: List[float]: A list of sentiment scores [-1 to 1]
     """
 
-    sentiment_analyzer = pipeline(model="distilbert/distilbert-base-uncased-finetuned-sst-2-english")
+    sentiment_analyzer = pipeline(
+        model="distilbert/distilbert-base-uncased-finetuned-sst-2-english"
+    )
     results = sentiment_analyzer(texts)
 
     sentiment_scores = []

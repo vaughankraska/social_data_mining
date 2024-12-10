@@ -27,6 +27,41 @@ def get_research_dataframe(db: Connection) -> pd.DataFrame:
     return pd.DataFrame(res)
 
 
+def get_tweet_corpora(db: Connection, min_chars: int = 1_000) -> pd.DataFrame:
+    """min_chars filters corpora before merging with accounts"""
+    cur = db.cursor()
+    res = cur.execute(
+        """
+            WITH unq as (
+                SELECT
+                    author_id,
+                    REPLACE(GROUP_CONCAT(DISTINCT text), ',', ' ') AS text_corpus
+                FROM (SELECT
+                          DISTINCT author_id,
+                          text
+                      FROM tweets)
+                GROUP BY author_id
+                HAVING LENGTH(text_corpus) > ?
+            )
+            SELECT
+                a.author_id,
+                unq.text_corpus,
+                a.account_type,
+                a.lang,
+                a.stance
+            FROM
+                accounts a
+            JOIN
+                unq
+            ON
+                a.author_id = unq.author_id
+            """,
+        [min_chars],
+    ).fetchall()
+
+    return pd.DataFrame(res)
+
+
 def load_sentiment_dict(file_path: str = "data/COPSSentimentDict.csv") -> Dict:
     df = pd.read_csv(file_path, delimiter=";")
     df = df.drop_duplicates(subset="TERM", keep="first")
@@ -44,7 +79,7 @@ def load_excel_annotations(file_path: str) -> pd.DataFrame:
         The gpt.tsv file is on studium in the lab.
     """
     excel_data = pd.ExcelFile(file_path)
-    sheet_names = ['INSTRUCTIONS', 'CODER1', 'CODER2', 'CODER3']
+    sheet_names = ["INSTRUCTIONS", "CODER1", "CODER2", "CODER3"]
 
     assert len(excel_data.sheet_names) == 4, "Sheets mismatch in excel file"
     assert sheet_names == excel_data.sheet_names, "Sheet names mismatch expectations"
@@ -55,7 +90,6 @@ def load_excel_annotations(file_path: str) -> pd.DataFrame:
     data_dir = os.path.dirname(file_path)
     gpt_df = pd.read_csv(os.path.join(data_dir, "gpt.tsv"), delimiter="\t")
     gpt_df.rename(columns={"SENTIMENT": "gpt_sentiment"}, inplace=True)
-
 
     merged_df = pd.merge(coder1_df, gpt_df, on="ID", how="left")
 
