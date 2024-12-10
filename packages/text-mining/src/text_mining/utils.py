@@ -206,7 +206,10 @@ def remove_stopwords(
         print(f"WARNING: Parse failed with lanuage '{language.to_string()}', falling back to english\nErr: {e}")
         stop_words = set(stopwords.words(language="english"))
 
-    return [word.lower() for word in tokens if word not in stop_words], stop_words
+    # Gotta remove some extra words
+    stop_words.update(["https", "rt", "la", "le", "les", "et", "en", "des"])
+
+    return [word.lower() for word in tokens if word.lower() not in stop_words], stop_words
 
 
 def lemmatize_tokens(
