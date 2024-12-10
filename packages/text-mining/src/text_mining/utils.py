@@ -1,6 +1,9 @@
 import math
+from sqlite3 import Connection
+import pandas as pd
 from typing import Dict, List, Tuple
-from text_mining.data import load_sentiment_dict
+from text_mining.data import load_sentiment_dict, get_tweet_corpora
+from text_mining.language import Language
 import re
 import krippendorff
 import numpy as np
@@ -17,6 +20,7 @@ from transformers import pipeline
 # Gotta download the nltk datasets
 nltk.download("stopwords")
 nltk.download("punkt")
+nltk.download("punkt_tab")
 nltk.download("wordnet")
 
 
@@ -172,3 +176,87 @@ def analyze_with_transformer(texts: List[str]) -> List[float]:
             sentiment_scores.append(score)
 
     return sentiment_scores
+
+
+# Data Driven Utils vvv
+def tokenize_corpus(text: str, language: Language = Language.en) -> List[str]:
+    """
+    Basic wrapper for nltk `word_tokenize`. Note the language param.
+    (this is literally just to make sure the downloads at the top of this file
+     are properly downloaded)
+    """
+    return nltk.word_tokenize(text, language=language.to_string())
+
+
+def remove_stopwords(
+        tokens: List[str],
+        language: Language
+        ) -> Tuple[List[str], set]:
+    """Removes stop words.
+    Usage:
+        >>> from text_mining.language import Language
+        >>> from text_mining.utils import tokenize_corpus, remove_stopwords
+        >>> tokens = tokenize_corpus("I am a dissapointed developer")
+        >>> remove_stopwords(tokens, [Language.en] * len(tokens))
+        (['dissapointed', 'developer'], {'doesn', 'wasn', ..., 'in', "don't"})
+    """
+    try:
+        stop_words = set(stopwords.words(language.to_string()))
+    except Exception as e:
+        print(f"WARNING: Parse failed with lanuage '{language.to_string()}', falling back to english\nErr: {e}")
+        stop_words = set(stopwords.words(language="english"))
+
+    return [word.lower() for word in tokens if word not in stop_words], stop_words
+
+
+def lemmatize_tokens(
+        tokens: List[str],
+        language: Language = Language.en
+        ) -> List[str]:
+    raise NotImplementedError
+
+
+def remove_non_alphabetic(tokens: List[str]) -> List[str]:
+    """
+    Removes tokens that contain non-alphabetic characters
+    e.g., punctuation, numbers. Might also remove other language's
+    characters. Havent tested.
+    """
+    return [word for word in tokens if word.isalpha()]
+
+
+def get_preprocessed_LDA(db: Connection, min_chars: int) -> pd.DataFrame:
+    """
+    db tweets corpora ->
+        dataframe ->
+            tokenize ->
+                remove stop words ->
+                    remove non-alpha =>
+                        DataFrame with "processed_corpus" col
+    Returns a new dataframe with pre-processed text.
+    """
+    df = get_tweet_corpora(db, min_chars=min_chars)
+    langs: List[Language] = df["lang"].apply(
+            lambda lang: Language.from_string(lang)
+            if lang is not None else Language.en
+            )
+    corpora: List[str] = df["text_corpus"].tolist()
+    assert len(langs) == len(corpora)
+
+    tokens_list = [
+            tokenize_corpus(
+                corpus,
+                language=lang
+                ) for corpus, lang in zip(corpora, langs)
+            ]
+    tokens_list = [
+            remove_stopwords(
+                tokens,
+                language=lang
+                )[0] for tokens, lang in zip(tokens_list, langs)
+            ]
+    tokens_list = [remove_non_alphabetic(tokens) for tokens in tokens_list]
+
+    df["processed_corpus"] = [" ".join(t) for t in tokens_list]
+
+    return df
