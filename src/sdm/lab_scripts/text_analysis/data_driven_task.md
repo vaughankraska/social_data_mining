@@ -21,6 +21,18 @@
   - Identify intruders.
   - Relate sampled texts to topics.
 - Reflect on the evaluation process.
+1. **First Task (Repeated N times):**
+   - Randomly select a topic (z).
+   - Randomly sample S units related to topic z (try S = 2).
+   - Randomly sample 1 unit not related to topic z.
+   - Shuffle the S+1 units and identify the intruder (the one not related to topic z).
+   - You can adjust S if needed.
+
+2. **Second Task (Repeated N times):**
+   - Randomly select a topic (z).
+   - Randomly sample S units related to topic z (try S = 1).
+   - Based on the sampled units and descriptions of topics, try to identify the topic (z). 
+
 
 ## Task 1.5: Comparison of Different Runs
 - Run LDA multiple times and check topic consistency.
