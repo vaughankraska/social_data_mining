@@ -26,6 +26,27 @@ def get_research_dataframe(db: Connection) -> pd.DataFrame:
 
     return pd.DataFrame(res)
 
+def get_accounts_dataframe(db: Connection) -> pd.DataFrame:
+    cur = db.cursor()
+    res = cur.execute("""
+               SELECT
+                   a.author_id AS account_id,
+                   t.text AS tweet_text,
+                   a.account_type,
+                   a.lang,
+                   a.stance
+               FROM
+                   accounts a
+               JOIN
+                   tweets t
+               ON
+                   a.author_id = t.author_id
+               WHERE
+                   a.lang = 'en'
+               """).fetchall()
+
+    return pd.DataFrame(res)
+
 
 def get_tweet_corpora(db: Connection, min_chars: int = 1_000) -> pd.DataFrame:
     """min_chars filters corpora before merging with accounts"""
