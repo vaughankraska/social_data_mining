@@ -28,7 +28,10 @@ def test() -> None:
     with get_db_connection(db_type="postgres") as db:
         with db.cursor() as cur:
             res = cur.execute("""
-            SELECT version();
+            SELECT text AS length
+            FROM submissions
+            ORDER BY LENGTH(text) DESC
+            LIMIT 1;
             """)
             print(res.fetchone())
 

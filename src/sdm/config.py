@@ -66,9 +66,9 @@ def get_pg_connection() -> PostGresConnection:
 
     Usage:
         with get_pg_connection() as conn:
-        with conn.cursor() as cur:
-            cur.execute("SELECT version();")
-            print(cur.fetchone())
+            with conn.cursor() as cur:
+                cur.execute("SELECT version();")
+                print(cur.fetchone())
     """
     db: Connection = psycopg.connect(
         dbname=PG_NAME,
@@ -76,6 +76,7 @@ def get_pg_connection() -> PostGresConnection:
         password=PG_PASSWORD,
         host=PG_HOST,
         port=PG_PORT,
-        cursor_factory=CursorQMark
+        cursor_factory=CursorQMark,
+        row_factory=psycopg.rows.dict_row
     )
     return db
