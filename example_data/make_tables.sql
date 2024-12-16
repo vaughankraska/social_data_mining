@@ -40,7 +40,7 @@ CREATE TABLE submission (
 -- Create table test_comment
 CREATE TABLE comment(
     comment_id varchar primary key,
-    link_id varchar,
+    link_id varchar, -- points to submission ID
     subreddit varchar, 
     parent_id varchar,
     redditor_id varchar,

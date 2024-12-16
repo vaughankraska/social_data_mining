@@ -27,6 +27,7 @@ dependencies = [
 
 [project.scripts]
 sdm = "sdm:main"
+ingest_pg = "sdm:ingest_pg"
 inaccounts = "sdm:insert_accounts"
 test = "sdm:test"
 

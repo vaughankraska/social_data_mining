@@ -1,5 +1,6 @@
 from sdm.config import get_db_connection
 from sdm.crud import ingest_accounts
+from sdm.crud import ingest_tweets, ingest_reddit
 
 
 def insert_accounts() -> None:
@@ -10,11 +11,26 @@ def insert_accounts() -> None:
         print(f"Accounts count: {res}")
 
 
+def ingest_pg() -> None:
+    # ingres tweets
+    with get_db_connection(db_type="postgres") as db:
+        ingest_tweets(db)
+    # ingres accounts
+    with get_db_connection(db_type="postgres") as db:
+        ingest_accounts(db)
+    # ingres reddit
+    with get_db_connection(db_type="postgres") as db:
+        ingest_reddit(db)
+
+
 def test() -> None:
+    # embeddings
     with get_db_connection(db_type="postgres") as db:
         with db.cursor() as cur:
-            cur.execute("SELECT version()")
-            print(cur.fetchone())
+            res = cur.execute("""
+            SELECT version();
+            """)
+            print(res.fetchone())
 
 
 def main() -> None:

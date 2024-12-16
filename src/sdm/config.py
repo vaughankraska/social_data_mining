@@ -1,10 +1,11 @@
 from typing import Union, Literal
 import sqlite3
-from sqlite3 import Connection as LiteConnection, Cursor
+from sqlite3 import Connection as LiteConnection, Cursor as LiteCursor
 import psycopg
-from psycopg import Connection as PostGresConnection
+from psycopg import Connection as PostGresConnection, Cursor as PGCursor
 
 Connection = Union[LiteConnection, PostGresConnection]
+Cursor = Union[PGCursor, LiteCursor]
 
 DB_NAME = "data/twitter.db"
 PG_NAME = "sdm"
@@ -12,6 +13,17 @@ PG_PASSWORD = "postgres"
 PG_USER = "postgres"
 PG_HOST = "localhost"
 PG_PORT = 5432
+
+
+class CursorQMark(PGCursor):
+    def execute(self, query, params=None):
+        # Convert placeholders since sqlite uses ? and pg uses %s
+        converted_query = query.replace('?', '%s')
+        return super().execute(converted_query, params)
+
+    def executemany(self, query, params_seq):
+        converted_query = query.replace('?', '%s')
+        return super().executemany(converted_query, params_seq)
 
 
 def dict_factory(cursor: Cursor, row):
@@ -58,10 +70,12 @@ def get_pg_connection() -> PostGresConnection:
             cur.execute("SELECT version();")
             print(cur.fetchone())
     """
-    return psycopg.connect(
+    db: Connection = psycopg.connect(
         dbname=PG_NAME,
         user=PG_USER,
         password=PG_PASSWORD,
         host=PG_HOST,
-        port=PG_PORT
+        port=PG_PORT,
+        cursor_factory=CursorQMark
     )
+    return db
