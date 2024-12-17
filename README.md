@@ -27,6 +27,7 @@ social_data_mining
 └── src
     └── sdm
         └── /lab_scripts (jupyter notbooks)
+        └── /project_scripts (jupyter notbooks)
         ├── config.py
         ├── __init__.py (currently has main function)
         ├── config.py

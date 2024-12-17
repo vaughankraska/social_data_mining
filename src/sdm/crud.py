@@ -314,7 +314,7 @@ def ingest_tweets(
         cur.executemany(rt_query, rt_chunk)
         db.commit()
 
-    res = cur.execute("SELECT COUNT(*) from tweets")
-    print(f"Tweets rows = {res.fetchone()[0]}")
-    res = cur.execute("SELECT COUNT(*) from referenced_tweets")
-    print(f"Ref Tweets rows = {res.fetchone()[0]}")
+    res = cur.execute("SELECT COUNT(*) as n from tweets")
+    print(f"Tweets rows = {res.fetchone()}")
+    res = cur.execute("SELECT COUNT(*) as n from referenced_tweets")
+    print(f"Ref Tweets rows = {res.fetchone()}")
