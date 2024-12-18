@@ -31,9 +31,6 @@ def test() -> None:
         # embed_submissions(db)
         embed_tweets(db)
         print("Embedded tweeets!!!")
-        # embed_tweets(db)
-        # for i in range(1000):
-        #     embed_doc(db, text=f"THIS IS A different test {1}", doc_id=f"{i}00101010", doc_type="tweet")
 
 
 def main() -> None:
