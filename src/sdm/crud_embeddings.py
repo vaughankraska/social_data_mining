@@ -11,7 +11,7 @@ def get_all_embeddings(db: Connection) -> pd.DataFrame:
     cebs = get_comment_embeddings(db)
     sebs = get_submission_embeddings(db)
 
-    df_all = pd.concat([tebs, cebs, sebs])
+    df_all = pd.concat([tebs, cebs, sebs], axis=0, ignore_index=True)
 
     return df_all
 
@@ -51,14 +51,14 @@ def get_comment_embeddings(db: Connection) -> pd.DataFrame:
         """).fetchall()
     df = pd.DataFrame(res)
     df["embedding"] = df["embedding"].apply(lambda t: json.loads(t))
-    return pd.DataFrame(res)
+    return df
 
 
 def get_submission_embeddings(db: Connection) -> pd.DataFrame:
     with db.cursor() as cur:
         res = cur.execute("""
         SELECT
-            e.id, s.text, e.doc_type, e.doc_id, e.embedding
+            e.id, s.text AS text, e.doc_type, e.doc_id, e.embedding
         FROM
             embeddings e
         JOIN
@@ -70,7 +70,7 @@ def get_submission_embeddings(db: Connection) -> pd.DataFrame:
         """).fetchall()
     df = pd.DataFrame(res)
     df["embedding"] = df["embedding"].apply(lambda t: json.loads(t))
-    return pd.DataFrame(res)
+    return df
 
 
 def create_embeddings_table(db: Connection):
