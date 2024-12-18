@@ -1,6 +1,6 @@
 from sdm.config import get_db_connection
-from sdm.crud import ingest_accounts
-from sdm.crud import ingest_tweets, ingest_reddit
+from sdm.crud import ingest_tweets, ingest_reddit, ingest_tweets, ingest_accounts
+from sdm.crud_embeddings import create_embeddings_table, embed_tweets, embed_comments, embed_submissions
 
 
 def insert_accounts() -> None:
@@ -26,14 +26,14 @@ def ingest_pg() -> None:
 def test() -> None:
     # embeddings
     with get_db_connection(db_type="postgres") as db:
-        with db.cursor() as cur:
-            res = cur.execute("""
-            SELECT text AS length
-            FROM submissions
-            ORDER BY LENGTH(text) DESC
-            LIMIT 1;
-            """)
-            print(res.fetchone())
+        # create_embeddings_table(db)
+        # embed_comments(db)
+        # embed_submissions(db)
+        embed_tweets(db)
+        print("Embedded tweeets!!!")
+        # embed_tweets(db)
+        # for i in range(1000):
+        #     embed_doc(db, text=f"THIS IS A different test {1}", doc_id=f"{i}00101010", doc_type="tweet")
 
 
 def main() -> None:

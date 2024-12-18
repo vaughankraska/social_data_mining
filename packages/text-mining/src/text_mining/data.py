@@ -26,6 +26,7 @@ def get_research_dataframe(db: Connection) -> pd.DataFrame:
 
     return pd.DataFrame(res)
 
+
 def get_accounts_dataframe(db: Connection) -> pd.DataFrame:
     cur = db.cursor()
     res = cur.execute("""
