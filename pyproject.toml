@@ -22,6 +22,9 @@ dependencies = [
     "gensim>=4.3.3",
     "pyldavis>=3.4.1",
     "psycopg[binary]>=3.2.3",
+    "numba>=0.60.0",
+    "umap-learn>=0.5.7",
+    "hdbscan>=0.8.40",
 ]
 
 [project.scripts]
