@@ -25,6 +25,7 @@ dependencies = [
     "numba>=0.60.0",
     "umap-learn>=0.5.7",
     "hdbscan>=0.8.40",
+    "image-analysis",
 ]
 
 [project.scripts]
@@ -36,6 +37,7 @@ test = "sdm:test"
 [tool.uv.sources]
 network-analysis = { workspace = true }
 text-mining = { workspace = true }
+image-analysis = { workspace = true }
 
 [tool.uv.workspace]
 members = ["packages/*"]
