@@ -15,11 +15,20 @@ social_data_mining
 │   │           ├── __init__.py
 │   │           ├── data.py (lab specific queries)
 │   │           └── utils.py (graph specific queries)
-│   └── text-mining
+│   ├──text-mining
+│   │    ├── pyproject.toml
+│   │    └── src
+│   │        └── text_mining
+│   │            ├── __init__.py
+│   │            ├── data.py (lab specific queries)
+│   │            └── utils.py (TODO: add utils for this lab here)
+│   │
+│   └──image-analysis
 │       ├── pyproject.toml
 │       └── src
-│           └── text_mining
+│           └── image_analysis
 │               ├── __init__.py
+│               ├── data.py (lab specific queries)
 │               └── utils.py (TODO: add utils for this lab here)
 ├── pyproject.toml
 ├── README.md

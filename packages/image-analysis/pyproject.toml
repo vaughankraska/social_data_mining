@@ -1,0 +1,14 @@
+[project]
+name = "image-analysis"
+version = "0.1.0"
+description = "Lib for image analysis section"
+readme = "README.md"
+authors = [
+    { name = "anandmatt", email = "anandmathewms@gmail.com" }
+]
+requires-python = ">=3.11"
+dependencies = [
+]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
