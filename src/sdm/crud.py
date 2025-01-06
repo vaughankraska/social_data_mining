@@ -89,6 +89,16 @@ def create_accounts_table(db: Connection):
             )
     """
     cur.execute(query)
+    
+def create_vllm_descriptions(db: Connection):
+    cur = db.cursor()
+    query = """
+    CREATE TABLE IF NOT EXISTS vllm_descriptions (
+            image_id TEXT,
+            labels TEXT
+            )
+    """
+    cur.execute(query)
 
 
 def ingest_accounts(
@@ -182,3 +192,31 @@ def ingest_tweets(
     print(f"Tweets rows = {res.fetchone()[0]}")
     res = cur.execute("SELECT COUNT(*) from referenced_tweets")
     print(f"Ref Tweets rows = {res.fetchone()[0]}")
+
+def ingest_vllm_descriptions(
+    db: Connection, data_path: str = "data/descriptions.tsv", chunk_size=10_000
+):
+    create_vllm_descriptions(db)
+    cur = db.cursor()
+    df = pd.read_csv(data_path, delimiter="\t", dtype={"ImageID": str})
+    df["ImageID"] = df["ImageID"].astype(str)
+    df["ImageID"] = df["ImageID"].apply(lambda x: x[:-4])
+    print(df.info())
+    query = """
+    INSERT INTO vllm_descriptions (
+            image_id,
+            labels
+            )
+    VALUES (?, ?)
+    """
+    vllm_columns = ["ImageID", "Labels"]
+    for i in range(0, len(df), chunk_size):
+        chunk = df.iloc[i : i + chunk_size]
+        chunk_values = chunk[vllm_columns].values.tolist()
+        try:
+            cur.executemany(query, chunk_values)
+            db.commit()
+        except Exception as e:
+            print(f"Error inserting chunk: {e}")
+            print(f"Chunk values: {chunk_values[:5]}") 
+    print("[*] Inserted descriptions")
