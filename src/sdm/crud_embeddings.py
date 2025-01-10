@@ -17,6 +17,20 @@ def get_all_embeddings(db: Connection) -> pd.DataFrame:
     return df_all
 
 
+def get_all_embeddings_clean(db: Connection) -> pd.DataFrame:
+    """
+    Get cleaned embeddings and the original text.
+    Note: I haven't cleaned the reddit data and remebedded.
+    """
+    tebs = get_tweet_embeddings_clean(db)
+    cebs = get_comment_embeddings(db)
+    sebs = get_submission_embeddings(db)
+
+    df_all = pd.concat([tebs, cebs, sebs], axis=0, ignore_index=True)
+
+    return df_all
+
+
 def get_tweet_embeddings(db: Connection) -> pd.DataFrame:
     with db.cursor() as cur:
         res = cur.execute("""
@@ -24,6 +38,25 @@ def get_tweet_embeddings(db: Connection) -> pd.DataFrame:
             e.id, t.text AS text, e.doc_type, e.doc_id, e.embedding
         FROM
             embeddings e
+        JOIN
+            tweets t
+        ON
+            e.doc_id = t.id
+        WHERE
+            doc_type = 'tweet'
+        """).fetchall()
+    df = pd.DataFrame(res)
+    df["embedding"] = df["embedding"].apply(lambda t: json.loads(t))
+    return df
+
+
+def get_tweet_embeddings_clean(db: Connection) -> pd.DataFrame:
+    with db.cursor() as cur:
+        res = cur.execute("""
+        SELECT
+            e.id, t.text AS text, e.doc_type, e.doc_id, e.embedding
+        FROM
+            embeddings_clean e
         JOIN
             tweets t
         ON
