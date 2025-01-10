@@ -159,6 +159,40 @@ def embed_tweets(db: Connection):
             print("[!] Due to: ", e)
 
 
+def embed_tweets_again(db: Connection):
+    with db.cursor() as cur:
+        tweets = cur.execute("""
+            SELECT
+               DISTINCT ON (t.text) a.author_id,
+               t.id,
+               t.text,
+               a.author_id AS account_id,
+               t.created_at,
+               a.account_type,
+               a.lang
+           FROM
+               accounts a
+           JOIN
+               tweets t
+           ON
+               a.author_id = t.author_id
+           WHERE
+               (a.lang = 'en' OR a.lang = 'fr')
+               AND a.account_type NOT IN ('Unclear', 'Private individuals', 'Business actors')
+        """).fetchall()
+    inserted_count = 0
+    total = len(tweets)
+    for idx, tweet in enumerate(tweets):
+        if idx % 99 == 0:
+            print(f"[*] Tweet {idx}/{total}")
+        try:
+            embed_doc(db, text=tweet["text"], doc_id=tweet["id"], doc_type="tweet")
+            inserted_count += 1
+        except Exception as e:
+            print("[!] Failed to insert tweet:", tweet)
+            print("[!] Due to: ", e)
+
+
 def embed_comments(db: Connection):
     with db.cursor() as cur:
         comments = cur.execute("""
