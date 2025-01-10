@@ -1,6 +1,12 @@
 from sdm.config import get_db_connection
-from sdm.crud import ingest_tweets, ingest_reddit, ingest_tweets, ingest_accounts
-from sdm.crud_embeddings import create_embeddings_table, embed_tweets, embed_comments, embed_submissions
+from sdm.crud import ingest_reddit, ingest_tweets, ingest_accounts
+from sdm.crud_embeddings import (
+        create_embeddings_table,
+        embed_tweets,
+        embed_comments,
+        embed_submissions,
+        embed_clean_tweets
+        )
 
 
 def insert_accounts() -> None:
@@ -29,7 +35,8 @@ def test() -> None:
         # create_embeddings_table(db)
         # embed_comments(db)
         # embed_submissions(db)
-        embed_tweets(db)
+        # embed_tweets(db)
+        embed_clean_tweets(db)
         print("Embedded tweeets!!!")
 
 

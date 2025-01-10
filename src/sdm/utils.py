@@ -1,3 +1,4 @@
+import re
 import json
 
 import pandas as pd
@@ -27,6 +28,33 @@ def tweets_as_dataframe(file_path: str = "data/tweets.dat", save=False) -> pd.Da
         raise
     except Exception as e:
         print("Error in tweets_as_dataframe: ", e)
+
+
+def clean_text(text: str) -> str:
+    """
+    Clean a tweet or reddit text by removing Twitter-specific formatting elements.
+    This is made for the embeddings comparisons between reddit and twitter.
+
+    Example:
+    >>> clean_tweet("RT @User: Hello #world https://t.co/link")
+    'Hello'
+    """
+    # Remove RT
+    text = re.sub(r'^RT\s+', '', text)
+    # Remove @mentions
+    text = re.sub(r'@\w+:?\s*', '', text)
+    # Remove hashtags and their text
+    text = re.sub(r'#\w+\s*', '', text)
+    # Remove URLs
+    text = re.sub(r'https?://\S+', '', text)
+    # Remove trailing ellipsis
+    text = re.sub(r'…$', '', text)
+    # Remove extra whitespace
+    text = re.sub(r'\s+', ' ', text)
+    # Strip leading/trailing whitespace
+    text = text.strip()
+
+    return text
         
 
 def get_pi_ba_dataframe(db: Connection) -> pd.DataFrame:
