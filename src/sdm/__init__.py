@@ -5,7 +5,9 @@ from sdm.crud_embeddings import (
         embed_tweets,
         embed_comments,
         embed_submissions,
-        embed_clean_tweets
+        embed_clean_tweets,
+        embed_clean_comments,
+        embed_clean_submissions
         )
 
 
@@ -36,7 +38,10 @@ def test() -> None:
         # embed_comments(db)
         # embed_submissions(db)
         # embed_tweets(db)
-        embed_clean_tweets(db)
+        # embed_clean_tweets(db)
+        # embed_clean_comments(db)
+        embed_clean_submissions(db)
+
         print("Embedded tweeets!!!")
 
 

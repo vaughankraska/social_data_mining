@@ -229,7 +229,8 @@ def embed_clean_tweets(db: Connection):
             print(f"[*] Tweet {idx}/{total}")
         try:
             text = clean_text(tweet["text"])
-            embed_cleaned_doc(db, text=text, doc_id=tweet["id"], doc_type="tweet")
+            if len(text) > 0:
+                embed_cleaned_doc(db, text=text, doc_id=tweet["id"], doc_type="tweet")
             inserted_count += 1
         except Exception as e:
             print("[!] Failed to insert tweet:", tweet)
@@ -274,7 +275,8 @@ def embed_clean_comments(db: Connection):
             print(f"[*] Comment {idx}/{total}")
         try:
             text = clean_text(comm["text"])
-            embed_cleaned_doc(db, text=text, doc_id=comm["id"], doc_type="comment")
+            if len(text) > 0:
+                embed_cleaned_doc(db, text=text, doc_id=comm["id"], doc_type="comment")
             inserted_count += 1
         except Exception as e:
             print("[!] Failed to insert comment:", comm)
@@ -319,7 +321,8 @@ def embed_clean_submissions(db: Connection):
             print(f"[*] Submission {idx}/{total}")
         try:
             text = clean_text(sub["text"])
-            embed_cleaned_doc(db, text=text, doc_id=sub["id"], doc_type="submission")
+            if len(text) > 0:
+                embed_cleaned_doc(db, text=text, doc_id=sub["id"], doc_type="submission")
             inserted_count += 1
         except Exception as e:
             print("[!] Failed to insert submission:", sub)
