@@ -3,6 +3,7 @@ import requests
 import pandas as pd
 from typing import Literal
 from sdm.config import Connection
+from sdm.utils import clean_text
 
 
 def get_all_embeddings(db: Connection) -> pd.DataFrame:
@@ -93,6 +94,16 @@ def create_embeddings_table(db: Connection):
             )
         """)
 
+        # For cleaned twitter/reddit embeddings
+        cur.execute("""
+        CREATE TABLE IF NOT EXISTS embeddings_clean (
+            id bigserial PRIMARY KEY,
+            doc_type DOC_TYPE NOT NULL,
+            doc_id TEXT NOT NULL UNIQUE,
+            embedding vector(768)
+            )
+        """)
+
 
 def embed_doc(
         db: Connection,
@@ -125,6 +136,37 @@ def embed_doc(
         print("Error occurred:", e)
 
 
+def embed_cleaned_doc(
+        db: Connection,
+        text: str,
+        doc_id: str,
+        doc_type: Literal["tweet", "submission", "comment"]
+        ):
+
+    url = "http://localhost:11434/api/embeddings"
+    payload = {
+        "model": "paraphrase-multilingual",
+        "prompt": text
+    }
+    try:
+        response = requests.post(url, json=payload)
+        response.raise_for_status()
+        embedding = response.json()["embedding"]
+        query = """
+        INSERT INTO embeddings_clean (
+                doc_type,
+                doc_id,
+                embedding
+                )
+        VALUES (?, ?, ?)
+        """
+
+        with db.cursor() as cur:
+            cur.execute(query, [doc_type, doc_id, embedding])
+    except requests.exceptions.RequestException as e:
+        print("Error occurred:", e)
+
+
 def embed_tweets(db: Connection):
     with db.cursor() as cur:
         tweets = cur.execute("""
@@ -144,7 +186,7 @@ def embed_tweets(db: Connection):
                a.author_id = t.author_id
            WHERE
                (a.lang = 'en' OR a.lang = 'fr')
-               AND a.account_type IN ('Private individuals', 'Business actors')
+               AND a.account_type NOT IN ('Unclear', 'NaN', 'to-do')
         """).fetchall()
     inserted_count = 0
     total = len(tweets)
@@ -159,10 +201,10 @@ def embed_tweets(db: Connection):
             print("[!] Due to: ", e)
 
 
-def embed_tweets_again(db: Connection):
+def embed_clean_tweets(db: Connection):
     with db.cursor() as cur:
         tweets = cur.execute("""
-            SELECT
+           SELECT
                DISTINCT ON (t.text) a.author_id,
                t.id,
                t.text,
@@ -178,7 +220,7 @@ def embed_tweets_again(db: Connection):
                a.author_id = t.author_id
            WHERE
                (a.lang = 'en' OR a.lang = 'fr')
-               AND a.account_type NOT IN ('Unclear', 'Private individuals', 'Business actors')
+               AND a.account_type NOT IN ('Unclear', 'NaN', 'to-do')
         """).fetchall()
     inserted_count = 0
     total = len(tweets)
@@ -186,7 +228,8 @@ def embed_tweets_again(db: Connection):
         if idx % 99 == 0:
             print(f"[*] Tweet {idx}/{total}")
         try:
-            embed_doc(db, text=tweet["text"], doc_id=tweet["id"], doc_type="tweet")
+            text = clean_text(tweet["text"])
+            embed_cleaned_doc(db, text=text, doc_id=tweet["id"], doc_type="tweet")
             inserted_count += 1
         except Exception as e:
             print("[!] Failed to insert tweet:", tweet)
@@ -215,6 +258,29 @@ def embed_comments(db: Connection):
             print("[!] Due to: ", e)
 
 
+def embed_clean_comments(db: Connection):
+    with db.cursor() as cur:
+        comments = cur.execute("""
+           SELECT
+               DISTINCT body AS text,
+               comment_id as id
+           FROM
+               comments
+        """).fetchall()
+    inserted_count = 0
+    total = len(comments)
+    for idx, comm in enumerate(comments):
+        if idx % 99 == 0:
+            print(f"[*] Comment {idx}/{total}")
+        try:
+            text = clean_text(comm["text"])
+            embed_cleaned_doc(db, text=text, doc_id=comm["id"], doc_type="comment")
+            inserted_count += 1
+        except Exception as e:
+            print("[!] Failed to insert comment:", comm)
+            print("[!] Due to: ", e)
+
+
 def embed_submissions(db: Connection):
     with db.cursor() as cur:
         submissions = cur.execute("""
@@ -231,6 +297,29 @@ def embed_submissions(db: Connection):
             print(f"[*] Submission {idx}/{total}")
         try:
             embed_doc(db, text=sub["text"], doc_id=sub["id"], doc_type="submission")
+            inserted_count += 1
+        except Exception as e:
+            print("[!] Failed to insert submission:", sub)
+            print("[!] Due to: ", e)
+
+
+def embed_clean_submissions(db: Connection):
+    with db.cursor() as cur:
+        submissions = cur.execute("""
+           SELECT
+               DISTINCT text AS text,
+               submission_id as id
+           FROM
+               submissions
+        """).fetchall()
+    inserted_count = 0
+    total = len(submissions)
+    for idx, sub in enumerate(submissions):
+        if idx % 99 == 0:
+            print(f"[*] Submission {idx}/{total}")
+        try:
+            text = clean_text(sub["text"])
+            embed_cleaned_doc(db, text=text, doc_id=sub["id"], doc_type="submission")
             inserted_count += 1
         except Exception as e:
             print("[!] Failed to insert submission:", sub)

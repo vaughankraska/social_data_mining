@@ -27,28 +27,28 @@ def tweets_as_dataframe(file_path: str = "data/tweets.dat", save=False) -> pd.Da
         print("Error in tweets_as_dataframe: ", e)
 
 
-def clean_tweet(tweet: str) -> str:
+def clean_text(text: str) -> str:
     """
-    Clean a tweet by removing Twitter-specific formatting elements.
+    Clean a tweet or reddit text by removing Twitter-specific formatting elements.
     This is made for the embeddings comparisons between reddit and twitter.
-    
+
     Example:
     >>> clean_tweet("RT @User: Hello #world https://t.co/link")
     'Hello'
     """
     # Remove RT
-    tweet = re.sub(r'^RT\s+', '', tweet)
+    text = re.sub(r'^RT\s+', '', text)
     # Remove @mentions
-    tweet = re.sub(r'@\w+:?\s*', '', tweet)
+    text = re.sub(r'@\w+:?\s*', '', text)
     # Remove hashtags and their text
-    tweet = re.sub(r'#\w+\s*', '', tweet)
+    text = re.sub(r'#\w+\s*', '', text)
     # Remove URLs
-    tweet = re.sub(r'https?://\S+', '', tweet)
+    text = re.sub(r'https?://\S+', '', text)
     # Remove trailing ellipsis
-    tweet = re.sub(r'…$', '', tweet)
+    text = re.sub(r'…$', '', text)
     # Remove extra whitespace
-    tweet = re.sub(r'\s+', ' ', tweet)
+    text = re.sub(r'\s+', ' ', text)
     # Strip leading/trailing whitespace
-    tweet = tweet.strip()
+    text = text.strip()
 
-    return tweet
+    return text
