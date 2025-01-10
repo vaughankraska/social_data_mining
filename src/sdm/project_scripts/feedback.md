@@ -66,3 +66,24 @@ TODO:
     - Execute what is feasible or a simplified version.
     - Highlight consequences of simplifications.
   - **Evaluation Focus**: The evaluation will focus on the study design and understanding of limitations.
+
+
+My scratch queries:
+avg distance of groups
+```sql
+WITH v1 AS (
+    SELECT id, embedding
+    FROM embeddings
+    WHERE doc_type = 'tweet'
+),
+v2 AS (
+    SELECT id, embedding
+    FROM embeddings
+    WHERE doc_type = 'submission'
+)
+SELECT avg(v1.embedding <-> v2.embedding) AS avg_distance
+FROM v1, v2
+WHERE v1.id != v2.id;
+```
+select embeddings with account type
+
