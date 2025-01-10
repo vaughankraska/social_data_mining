@@ -20,11 +20,10 @@ def get_all_embeddings(db: Connection) -> pd.DataFrame:
 def get_all_embeddings_clean(db: Connection) -> pd.DataFrame:
     """
     Get cleaned embeddings and the original text.
-    Note: I haven't cleaned the reddit data and remebedded.
     """
     tebs = get_tweet_embeddings_clean(db)
-    cebs = get_comment_embeddings(db)
-    sebs = get_submission_embeddings(db)
+    cebs = get_comment_embeddings_clean(db)
+    sebs = get_submission_embeddings_clean(db)
 
     df_all = pd.concat([tebs, cebs, sebs], axis=0, ignore_index=True)
 
@@ -88,6 +87,25 @@ def get_comment_embeddings(db: Connection) -> pd.DataFrame:
     return df
 
 
+def get_comment_embeddings_clean(db: Connection) -> pd.DataFrame:
+    with db.cursor() as cur:
+        res = cur.execute("""
+        SELECT
+            e.id, c.body AS text, e.doc_type, e.doc_id, e.embedding
+        FROM
+            embeddings_clean e
+        JOIN
+            comments c
+        ON
+            e.doc_id = c.comment_id
+        WHERE
+            doc_type = 'comment'
+        """).fetchall()
+    df = pd.DataFrame(res)
+    df["embedding"] = df["embedding"].apply(lambda t: json.loads(t))
+    return df
+
+
 def get_submission_embeddings(db: Connection) -> pd.DataFrame:
     with db.cursor() as cur:
         res = cur.execute("""
@@ -95,6 +113,25 @@ def get_submission_embeddings(db: Connection) -> pd.DataFrame:
             e.id, s.text AS text, e.doc_type, e.doc_id, e.embedding
         FROM
             embeddings e
+        JOIN
+            submissions s
+        ON
+            e.doc_id = s.submission_id
+        WHERE
+            doc_type = 'submission'
+        """).fetchall()
+    df = pd.DataFrame(res)
+    df["embedding"] = df["embedding"].apply(lambda t: json.loads(t))
+    return df
+
+
+def get_submission_embeddings_clean(db: Connection) -> pd.DataFrame:
+    with db.cursor() as cur:
+        res = cur.execute("""
+        SELECT
+            e.id, s.text AS text, e.doc_type, e.doc_id, e.embedding
+        FROM
+            embeddings_clean e
         JOIN
             submissions s
         ON
@@ -262,7 +299,8 @@ def embed_clean_tweets(db: Connection):
             print(f"[*] Tweet {idx}/{total}")
         try:
             text = clean_text(tweet["text"])
-            embed_cleaned_doc(db, text=text, doc_id=tweet["id"], doc_type="tweet")
+            if len(text) > 0:
+                embed_cleaned_doc(db, text=text, doc_id=tweet["id"], doc_type="tweet")
             inserted_count += 1
         except Exception as e:
             print("[!] Failed to insert tweet:", tweet)
@@ -307,7 +345,8 @@ def embed_clean_comments(db: Connection):
             print(f"[*] Comment {idx}/{total}")
         try:
             text = clean_text(comm["text"])
-            embed_cleaned_doc(db, text=text, doc_id=comm["id"], doc_type="comment")
+            if len(text) > 0:
+                embed_cleaned_doc(db, text=text, doc_id=comm["id"], doc_type="comment")
             inserted_count += 1
         except Exception as e:
             print("[!] Failed to insert comment:", comm)
@@ -352,7 +391,8 @@ def embed_clean_submissions(db: Connection):
             print(f"[*] Submission {idx}/{total}")
         try:
             text = clean_text(sub["text"])
-            embed_cleaned_doc(db, text=text, doc_id=sub["id"], doc_type="submission")
+            if len(text) > 0:
+                embed_cleaned_doc(db, text=text, doc_id=sub["id"], doc_type="submission")
             inserted_count += 1
         except Exception as e:
             print("[!] Failed to insert submission:", sub)

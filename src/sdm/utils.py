@@ -1,6 +1,9 @@
-import pandas as pd
 import re
 import json
+
+import pandas as pd
+
+from sdm.config import Connection
 
 
 def tweets_as_dataframe(file_path: str = "data/tweets.dat", save=False) -> pd.DataFrame:
@@ -52,3 +55,48 @@ def clean_text(text: str) -> str:
     text = text.strip()
 
     return text
+        
+
+def get_pi_ba_dataframe(db: Connection) -> pd.DataFrame:
+    cur = db.cursor()
+    res = cur.execute("""
+        SELECT
+            a.author_id AS account_id,
+            t.id AS doc_id,
+            a.account_type,
+            a.lang,
+            a.stance
+        FROM
+            accounts a
+        JOIN
+            tweets t
+        ON
+            a.author_id = t.author_id
+        WHERE
+            (a.lang = 'en' OR a.lang = 'fr')
+            AND a.account_type IN ('Private individuals', 'Business actors')                  
+    """).fetchall()
+    
+    return pd.DataFrame(res)
+
+def get_ja_aa_pa_sa_bot_dataframe(db: Connection) -> pd.DataFrame:
+    cur = db.cursor()
+    res = cur.execute("""
+        SELECT
+            a.author_id AS account_id,
+            t.id AS doc_id,
+            a.account_type,
+            a.lang,
+            a.stance
+        FROM
+            accounts a
+        JOIN
+            tweets t
+        ON
+            a.author_id = t.author_id
+        WHERE
+            (a.lang = 'en' OR a.lang = 'fr')
+            AND a.account_type IN ('Advocacy actors', 'Journalistic actors', 'Political actors', 'Scientific actors', 'Bots')
+    """).fetchall()
+    
+    return pd.DataFrame(res)
