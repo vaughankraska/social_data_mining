@@ -22,6 +22,8 @@ CONTAINER ID   IMAGE                    COMMAND                  CREATED        
 `psql sdm`
 
 #### Helpful psql commands
+Run a backup file:
+`psql -d sdm -f <some backup file that is in the container>.sql`
 List databases:
 `\l`
 
@@ -39,3 +41,21 @@ Run raw queries:
 
 Exit:
 `\q`
+
+### pg_dump Commands + Docker
+Dump a single table into .sql file for us to restore other embedding versions.
+```bash
+# (execed into db container)
+pg_dump -t embeddings sdm > embeddings_table.sql
+```
+
+And to copy that file out to your local file system:
+```bash
+# (run from root of our project)
+docker cp <dbcontainer id>:/embeddings_table.sql ./data/embeddings_table.sql
+```
+
+Or copying a backup file from local system into container
+```bash
+docker cp ./data/embedding_table.sql <dbcontainer id>:/embeddings_table.sql
+```
