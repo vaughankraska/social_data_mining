@@ -86,4 +86,35 @@ FROM v1, v2
 WHERE v1.id != v2.id;
 ```
 select embeddings with account type
-
+```sql
+WITH ta AS (
+    SELECT
+       t.id,
+       a.author_id AS account_id,
+       t.text,
+       a.account_type,
+       a.lang,
+       a.stance
+    FROM
+       accounts a
+    JOIN
+       tweets t
+    ON
+       a.author_id = t.author_id
+    WHERE
+       a.lang = 'en'
+       AND a.account_type IN ('Private individuals', 'Business actors')
+    LIMIT 10
+)
+SELECT
+    DISTINCT ON (ta.text) text,
+    ta.account_id,
+    ta.account_type,
+    ta.lang,
+    ta.stance,
+    e.embedding,
+    e.doc_id
+FROM ta
+JOIN embeddings e
+ON e.doc_id = ta.id;
+```
